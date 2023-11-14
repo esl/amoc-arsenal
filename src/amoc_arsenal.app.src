@@ -1,15 +1,35 @@
-{application, amoc_arsenal,
- [{description, "An OTP application"},
-  {vsn, "0.1.0"},
-  {registered, []},
-  {mod, {amoc_arsenal_app, []}},
-  {applications,
-   [kernel,
-    stdlib
-   ]},
-  {env,[]},
-  {modules, []},
-
-  {licenses, ["Apache-2.0"]},
-  {links, []}
- ]}.
+{application, amoc_arsenal, [
+    {description, "An OTP application"},
+    {vsn, "0.1.0"},
+    {registered, []},
+    {mod, {amoc_arsenal_app, []}},
+    {applications, [
+        kernel,
+        stdlib,
+        amoc,
+        exometer_core,
+        exometer_report_graphite,
+        amoc_rest,
+        docsh
+    ]},
+    {env, [
+        {exometer_predefined, [
+            {
+                [erlang, system_info],
+                {function, erlang, system_info, ['$dp'], value, [port_count, process_count]},
+                []
+            },
+            {
+                [erlang, memory],
+                {function, erlang, memory, ['$dp'], value, [
+                    total, processes, processes_used, system, binary, ets
+                ]},
+                []
+            },
+            {[amoc, users], {function, ets, info, [amoc_users], proplist, [size]}, []}
+        ]}
+    ]},
+    {modules, []},
+    {licenses, ["Apache-2.0"]},
+    {links, []}
+]}.
