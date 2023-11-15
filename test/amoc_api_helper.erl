@@ -9,17 +9,17 @@
 
 -spec start_amoc() -> any().
 start_amoc() ->
-    application:ensure_all_started(amoc_arsenal).
+    {ok, _} = application:ensure_all_started(amoc_arsenal).
 
 -spec stop_amoc() -> any().
 stop_amoc() ->
-    application:stop(amoc_arsenal).
+    application:stop(amoc_arsenal),
+    application:stop(amoc).
 
 -spec remove_module(module()) -> any().
 remove_module(M) ->
-    erlang:delete_module(M),
-    erlang:purge_module(M),
-    amoc_scenario:remove_module(M),
+    true = code:delete(M),
+    code:purge(M),
     ok = file:delete(module_src(M)),
     ok = file:delete(module_beam(M)).
 

@@ -4,7 +4,7 @@
 %%   some edoc
 %% @end
 %%==============================================================================
--module(",(atom_to_binary(Name,utf8))/binary,").
+-module(", (atom_to_binary(Name, utf8))/binary, ").
 -behaviour(amoc_scenario).
 
 -required_variable(#{name => some_parameter, description => \"some parameter\"}).
@@ -19,4 +19,5 @@ init() ->
 -spec start(amoc_scenario:user_id()) -> any().
 start(Id) ->
     amoc_user:stop().
-">>).
+
+%% generated at", ?FILE, ":", (integer_to_binary(?LINE))/binary>>).

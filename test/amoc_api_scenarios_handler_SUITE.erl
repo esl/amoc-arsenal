@@ -46,7 +46,6 @@ tests() ->
     ].
 
 init_per_testcase(get_scenario_info_returns_404_when_scenario_does_not_exist, Config) ->
-    amoc_scenario:remove_module(?SAMPLE_SCENARIO),
     amoc_api_helper:start_amoc(),
     Config;
 init_per_testcase(_, Config) ->
@@ -55,6 +54,7 @@ init_per_testcase(_, Config) ->
 
 end_per_testcase(TestCase, _Config)
     when TestCase =:= get_scenario_info_returns_200_when_scenario_exists;
+         TestCase =:= get_scenario_defaults_returns_200_when_scenario_exists;
          TestCase =:= put_scenarios_returns_200_when_scenario_valid ->
     amoc_api_helper:remove_module(?SAMPLE_SCENARIO),
     amoc_api_helper:stop_amoc();
@@ -118,7 +118,6 @@ put_scenarios_returns_200_when_scenario_valid(Config) ->
 
 
 get_scenario_info_returns_404_when_scenario_does_not_exist(_Config) ->
-    amoc_scenario:remove_module(?SAMPLE_SCENARIO),
     %% when
     {CodeHttp, _Body} = amoc_api_helper:get(?SCENARIOS_URL_I(?SAMPLE_SCENARIO)),
     %% then
