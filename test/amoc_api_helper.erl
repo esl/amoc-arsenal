@@ -1,8 +1,8 @@
 -module(amoc_api_helper).
 
 -export([get/1, put/2, patch/1, patch/2,
-         remove_module/1, module_src/1, module_beam/1,
-         start_amoc/0, stop_amoc/0]).
+         start_amoc/0, stop_amoc/0,
+         remove_module/1]).
 
 -type json() :: jsx:json_term().
 
@@ -18,21 +18,10 @@ stop_amoc() ->
 
 -spec remove_module(module()) -> any().
 remove_module(M) ->
-    true = code:delete(M),
-    code:purge(M),
-    ok = file:delete(module_src(M)),
-    ok = file:delete(module_beam(M)).
-
--spec module_src(module()) -> string().
-module_src(M) ->
-    CodeDir = filename:join(code:priv_dir(amoc), "scenarios"),
-    filename:join([CodeDir, atom_to_list(M) ++ ".erl"]).
-
--spec module_beam(module()) -> string().
-module_beam(M) ->
-    BeamDir = filename:join(code:priv_dir(amoc), "scenarios_ebin"),
-    filename:join([BeamDir, atom_to_list(M) ++ ".beam"]).
-
+    amoc_compile:remove_module(M),
+    %% we cannot remove module from amoc_code_server ETS tables,
+    %% so let's just restart it
+    supervisor:restart_child(amoc_sup, amoc_code_server).
 
 -spec get(string()) -> {integer(), json()}.
 get(Path) -> get(get_url(), Path).

@@ -73,7 +73,7 @@ read_settings(SettingsMap) ->
 
 read_kv(K, V) ->
     Key = binary_to_atom(K, utf8),
-    case amoc_config_env:parse_value(V) of
+    case amoc_config_parser:parse_value(V) of
         {ok, Value} -> {Key, Value};
         {error, E} ->
             throw({invalid_value, K, V, E})

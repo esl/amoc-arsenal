@@ -18,4 +18,4 @@ get_env(Name, Default) ->
     amoc_config_env:get(Name, Default).
 
 format_value(Value) ->
-    amoc_config_env:format(Value, string).
+    amoc_config_parser:format(Value, string).

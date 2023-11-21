@@ -34,7 +34,7 @@ get_controller_status() ->
                  disabled -> #{status => <<"disabled">>};
                  {error, Error} ->
                      #{status => <<"error">>,
-                       error => amoc_config_env:format(Error, binary)};
+                       error => amoc_config_parser:format(Error, binary)};
                  {terminating, Scenario} ->
                      #{status => <<"terminating">>,
                        scenario => atom_to_binary(Scenario, utf8)};
@@ -58,6 +58,6 @@ maybe_add_settings(Status) -> Status.
 get_current_settings() ->
     {ok, ConfigMap} = amoc_config_scenario:get_current_configuration(),
     F = fun(_Name, #{value := Value}) ->
-            amoc_config_env:format(Value, binary)
+            amoc_config_parser:format(Value, binary)
         end,
     maps:map(F, ConfigMap).

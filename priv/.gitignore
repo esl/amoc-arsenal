@@ -1,0 +1,3 @@
+## priv directory is used only for storing uploaded modules and beam files
+*
+!.gitignore

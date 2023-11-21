@@ -35,7 +35,7 @@ all() ->
 
 init_per_suite(Config) ->
     amoc_api_helper:start_amoc(),
-    ok = amoc_scenario:install_module(sample_test, dummy_scenario_module()),
+    ok = amoc_compile:install_module(sample_test, dummy_scenario_module()),
     Config.
 
 end_per_suite(_Config) ->
@@ -284,7 +284,7 @@ invalid_json_settings_and_error() ->
     {InvalidJsonSettings, Error}.
 
 json_settings() ->
-    Settings = [{K, amoc_config_env:format(V, binary)} || {K, V} <- settings()],
+    Settings = [{K, amoc_config_parser:format(V, binary)} || {K, V} <- settings()],
     maps:from_list(Settings).
 
 settings() ->

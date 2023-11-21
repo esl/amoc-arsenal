@@ -61,13 +61,13 @@ add_item(I) ->
 
 -spec format(any()) -> binary().
 format(Value) ->
-    amoc_config_env:format(Value, binary).
+    amoc_config_parser:format(Value, binary).
 
 -spec is_loaded(binary()) -> {true, amoc:scenario()} | false.
 is_loaded(ScenarioName) ->
     case to_existing_atom(ScenarioName) of
         {true, Scenario} ->
-            case amoc_scenario:does_scenario_exist(Scenario) of
+            case amoc_code_server:does_scenario_exist(Scenario) of
                 true -> {true, Scenario};
                 false -> false
             end;

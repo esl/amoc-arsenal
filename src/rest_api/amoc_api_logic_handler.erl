@@ -33,7 +33,7 @@ handle_request('NodesGet', _Req, _Context) ->
     ResponseList = Up ++ Down,
     {200, #{}, #{nodes => ResponseList}};
 handle_request('ScenariosGet', _Req, _Context) ->
-    Scenarios = amoc_scenario:list_scenario_modules(),
+    Scenarios = amoc_code_server:list_scenario_modules(),
     BinaryScenarios = [atom_to_binary(S, utf8) || S <- Scenarios],
     {200, #{}, #{scenarios => BinaryScenarios}};
 handle_request('ScenariosDefaultsIdGet', _Req, #{id := ScenarioName}) ->
@@ -105,4 +105,4 @@ handle_request(OperationID, Req, Context) ->
 
 process_ret_value({ok, _}) -> {200, #{}, #{}};
 process_ret_value({error, Error}) ->
-    {500, #{}, #{error => amoc_config_env:format(Error, binary)}}.
+    {500, #{}, #{error => amoc_config_parser:format(Error, binary)}}.

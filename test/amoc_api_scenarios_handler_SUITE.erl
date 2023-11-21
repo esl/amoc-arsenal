@@ -74,7 +74,7 @@ put_scenarios_returns_400_and_error_when_scenario_is_not_valid(_Config) ->
     ScenarioContent = "invalid_source",
     %% when
     {CodeHttp, Body} = amoc_api_helper:put(?SCENARIOS_URL_U, ScenarioContent),
-    ScenarioFileSource = amoc_api_helper:module_src(?SAMPLE_SCENARIO),
+    ScenarioFileSource = amoc_compile:module_src(?SAMPLE_SCENARIO),
     %% then
     ?assertNot(filelib:is_regular(ScenarioFileSource)),
     ?assertEqual(400, CodeHttp),
@@ -93,7 +93,7 @@ put_scenarios_returns_200_and_compile_error_when_scenario_source_not_valid(_Conf
     ScenarioContent = ?SAMPLE_SCENARIO_DECLARATION ++ "\ninvalid_source",
     %% when
     {CodeHttp, Body} = amoc_api_helper:put(?SCENARIOS_URL_U, ScenarioContent),
-    ScenarioFileSource = amoc_api_helper:module_src(?SAMPLE_SCENARIO),
+    ScenarioFileSource = amoc_compile:module_src(?SAMPLE_SCENARIO),
     %% then
     ?assertNot(filelib:is_regular(ScenarioFileSource)),
     ?assertEqual(200, CodeHttp),
@@ -106,8 +106,8 @@ put_scenarios_returns_200_when_scenario_valid(Config) ->
     ScenarioContent = ?DUMMY_SCENARIO_MODULE(?SAMPLE_SCENARIO),
     %% when
     {CodeHttp, Body} = amoc_api_helper:put(?SCENARIOS_URL_U, ScenarioContent),
-    ScenarioFileSource = amoc_api_helper:module_src(?SAMPLE_SCENARIO),
-    ScenarioFileBeam = amoc_api_helper:module_beam(?SAMPLE_SCENARIO),
+    ScenarioFileSource = amoc_compile:module_src(?SAMPLE_SCENARIO),
+    ScenarioFileBeam = amoc_compile:module_beam(?SAMPLE_SCENARIO),
     %% then
     ?assertEqual(200, CodeHttp),
     ?assertEqual(#{<<"compile">> => <<"ok">>}, Body),
@@ -126,7 +126,7 @@ get_scenario_info_returns_404_when_scenario_does_not_exist(_Config) ->
 get_scenario_info_returns_200_when_scenario_exists(Config) ->
     %% given scenario exists
     put_scenarios_returns_200_when_scenario_valid(Config),
-    mock_amoc_scenario(),
+    mock_amoc_code_server(),
     %% when
     {CodeHttp, Body} = amoc_api_helper:get(?SCENARIOS_URL_I(?SAMPLE_SCENARIO)),
     ?assertEqual(200, CodeHttp),
@@ -150,7 +150,7 @@ get_scenario_info_returns_200_when_scenario_exists(Config) ->
                                  <<"verification_fn">> =>
                                  <<"fun amoc_config_attributes:none/1">>}}},
     ?assertMatch(ExpectedInfo, Body),
-    meck:unload(amoc_scenario).
+    meck:unload(amoc_code_server).
 
 get_scenario_defaults_returns_404_when_scenario_does_not_exist(_Config) ->
     %% when
@@ -161,22 +161,22 @@ get_scenario_defaults_returns_404_when_scenario_does_not_exist(_Config) ->
 get_scenario_defaults_returns_200_when_scenario_exists(Config) ->
     %% given scenario exists
     put_scenarios_returns_200_when_scenario_valid(Config),
-    mock_amoc_scenario(),
+    mock_amoc_code_server(),
     %% when
     {CodeHttp, Body} = amoc_api_helper:get(?SCENARIOS_URL_D(?SAMPLE_SCENARIO)),
     ?assertEqual(200, CodeHttp),
     ExpectedInfo = #{<<"settings">> => #{<<"interarrival">> => <<"50">>,
                                          <<"some_parameter">> => <<"undefined">>}},
     ?assertMatch(ExpectedInfo, Body),
-    meck:unload(amoc_scenario).
+    meck:unload(amoc_code_server).
 
-mock_amoc_scenario() ->
-    ok = meck:new(amoc_scenario, [passthrough]),
+mock_amoc_code_server() ->
+    ok = meck:new(amoc_code_server, [passthrough]),
     Fun = fun() ->
             Modules = meck:passthrough([]),
             Modules -- arsenal_app_modules()
           end,
-    ok = meck:expect(amoc_scenario, list_configurable_modules, Fun).
+    ok = meck:expect(amoc_code_server, list_configurable_modules, Fun).
 
 -spec arsenal_app_modules() -> [atom()].
 arsenal_app_modules() ->
