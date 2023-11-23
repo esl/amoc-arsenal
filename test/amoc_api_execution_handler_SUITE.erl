@@ -92,13 +92,13 @@ setup_meck(add_users_on_nodes) ->
     meck:expect(amoc_dist, add, fun(10, [node1@host1, node2@host2]) -> {ok, mocked} end);
 setup_meck(remove_users) ->
     meck:expect(amoc_dist, get_state, fun() -> running end),
-    meck:expect(amoc_dist, remove, fun(10, false) -> {ok, mocked} end);
+    meck:expect(amoc_dist, remove, fun(10, true) -> {ok, mocked} end);
 setup_meck(fail_to_remove_users_when_amoc_dist_fails) ->
     meck:expect(amoc_dist, get_state, fun() -> running end),
-    meck:expect(amoc_dist, remove, fun(10, false) -> {error, mocked} end);
+    meck:expect(amoc_dist, remove, fun(10, true) -> {error, mocked} end);
 setup_meck(remove_users_on_nodes) ->
     meck:expect(amoc_dist, get_state, fun() -> running end),
-    meck:expect(amoc_dist, remove, fun(10, false, [node1@host1, node2@host2]) -> {ok, mocked} end);
+    meck:expect(amoc_dist, remove, fun(10, true, [node1@host1, node2@host2]) -> {ok, mocked} end);
 setup_meck(update_settings) ->
     meck:expect(amoc_dist, get_state, fun() -> running end),
     meck:expect(amoc_dist, update_settings,

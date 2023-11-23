@@ -65,9 +65,9 @@ add_users(_) ->
 
 -spec remove_users(body()) -> ret_value().
 remove_users(#{<<"users">> := Users, <<"nodes">> := Nodes}) ->
-    amoc_dist:remove(Users, false, read_nodes(Nodes));
+    amoc_dist:remove(Users, true, read_nodes(Nodes));
 remove_users(#{<<"users">> := Users}) ->
-    amoc_dist:remove(Users, false);
+    amoc_dist:remove(Users, true);
 remove_users(_) ->
     {error, invalid_body}.
 
