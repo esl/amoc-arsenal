@@ -15,7 +15,7 @@ function get_scenarios() {
          --request GET "http://localhost:${port}/scenarios"
 }
 
-function list_scenarios_by_port() {
+function list_scenarios() {
     local result="$(get_scenarios "$1")"
     echo "Scenarios on the ${1} node: ${result}"
 }
@@ -24,7 +24,7 @@ function ensure_scenarios_installed() {
     local result="$(get_scenarios "$1")"
     echo "Scenarios on the ${1} node: ${result}"
     shift 1
-    echo "$result" | contain "$@"
+    echo "$result" | contains "$@"
 }
 
 function upload_module() {
@@ -34,15 +34,15 @@ function upload_module() {
          "http://localhost:${port}/scenarios/upload"
 }
 
-list_scenarios_by_port amoc-master
-list_scenarios_by_port amoc-worker-1
-list_scenarios_by_port amoc-worker-2
+list_scenarios amoc-master
+list_scenarios amoc-worker-1
+list_scenarios amoc-worker-2
 
 echo "Installing scenario and helper module on the amoc-master node"
-scenario_put="$(upload_module amoc-master "${scenario_name}.erl")"
-echo "Response for '${scenario_name}.erl': ${scenario_put}"
-helper_put="$(upload_module amoc-master "dummy_helper.erl")"
-echo "Response for 'dummy_helper.erl': ${helper_put}"
+scenario_uploading="$(upload_module amoc-master "${scenario_name}.erl")"
+echo "Response for '${scenario_name}.erl': ${scenario_uploading}"
+helper_uploading="$(upload_module amoc-worker-1 "dummy_helper.erl")"
+echo "Response for 'dummy_helper.erl': ${helper_uploading}"
 
-ensure_scenarios_installed amoc-worker-1 ${scenario_name}
-ensure_scenarios_installed amoc-worker-2 ${scenario_name}
+ensure_scenarios_installed amoc-worker-1 "$scenario_name"
+ensure_scenarios_installed amoc-worker-2 "$scenario_name"

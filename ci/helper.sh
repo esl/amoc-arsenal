@@ -10,42 +10,36 @@ function enable_strict_mode() {
     IFS=$'\n\t'
 }
 
-function create_code_path() {
-    dir="${git_root}/ci/extra_code_paths/${1}"
-    [ -d "$dir" ] || return 1
-    erl_file="${dir}/${1}.erl"
-    dummy_scenario="${git_root}/ci/dummy_scenario.erl"
-    sed "s/-module(.*)./-module(${1})./" "$dummy_scenario" > "$erl_file"
-    erlc -o "$dir" "$erl_file"
-}
-
-function contain() {
-    local pipeline='cat -'
+function contains() {
+    local output="$(cat -)"
+    local ret= acc=0
     for pattern in "$@"; do
-        pipeline+=" | tee >(grep -q -e \"$pattern\"; echo \"+\$?\")"
+        ret="$(echo "$output" | grep -q -e "$pattern"; echo "$?")"
+        if [ "$ret" -ne "0" ]; then
+            [ "$(($acc))" -eq "0" ] && {
+                echo "contains FAILED"
+                echo "output: '${output}'"; }
+            echo "pattern is missing: '${pattern}'"
+        fi >&2
+        acc+="+${ret}"
     done
-    pipeline+=' >/dev/null'
-    local output="$(eval "$pipeline")"
-    test "$(($output))" -eq 0
+    test "$(($acc))" "-eq" "0"
 }
 
-function wait_for_cmd() {
-    local timeout="${1:-0}"
-    local cmd="${2:-true}"
-    shift 2
-    local full_cmd=("$cmd" "$@")
-    echo "Waiting for '${full_cmd[@]}'"
-    for i in $(seq 0 "${timeout}"); do
-        if "${full_cmd[@]}"; then
-            [ "$i" -ne 0 ] && echo
-            echo "Waiting is done after $i seconds"
-            return 0
-        fi
-        echo -n "."
+function retry() {
+    local n="$1" m="0"
+    local output=
+    shift 1
+    echo "waiting for '$@'"
+    until echo -n "." && output="$("$@" 2>&1)"; do
+        [ "$n" -gt "$m" ] || {
+            echo -e "\nfailed after '$m' retries\nlast output"
+            echo "${output}"
+            return 1; }
         sleep 1
+        m="$(( m + 1 ))"
     done
-    echo -e "\nKilled by timeout"
-    return 1
+    echo -e "\nsuccess after '$m' retries";
 }
 
 ######################
@@ -63,35 +57,35 @@ function amoc_container_port() {
     esac
 }
 
-docker_compose() {
+function docker_compose() {
     local compose_file="${git_root}/ci/docker-compose.yml"
     docker compose -p "amoc-demo-cluster" -f "$compose_file" "$@"
 }
 
-function amoc_eval() {
-    local exec_path="amoc_arsenal"
-    local service="$1"
-    shift 1
-    docker_compose exec -T "$service" "$exec_path" eval "$@"
+#############################
+## amoc REST API functions ##
+#############################
+function get_nodes() {
+    local servise="$1"
+    port="$(amoc_container_port "$servise")"
+    curl -s -X GET "http://localhost:${port}/nodes" -H  "accept: application/json"
 }
 
-function container_is_healthy() {
-   docker_compose ps $1 | contain "healthy"
+function get_status() {
+    local servise="$1"
+    local port="$(amoc_container_port "$servise")"
+    curl -s -X GET "http://localhost:${port}/status" -H  "accept: application/json"
 }
 
-function wait_for_healthcheck() {
-    local container=$1
-    wait_for_cmd 60 container_is_healthy "$container"
-}
-
+#################################
+## graphite REST API functions ##
+#################################
 function metrics_reported() {
-    local graphite_query="target=summarize(*.amoc.users.size,'1hour','max')&from=-1h&format=json"
-    local result="$(curl -s "http://localhost:8080/render/?${graphite_query}")"
-    echo "$result" | contain "$@"
+    curl -s "http://localhost:8080/metrics/find?query=*" | contains "$@"
 }
 
 function wait_for_metrics() {
-     wait_for_cmd 60 metrics_reported "$@"
+     retry 60 metrics_reported "$@"
 }
 
 ######################
