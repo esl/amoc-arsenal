@@ -44,26 +44,34 @@ end_per_suite(_Config) ->
 
 init_per_testcase(TC, Config) ->
     meck:new(amoc_dist, []),
+    meck:new(amoc_config, []),
     setup_meck(TC),
     Config.
 
 end_per_testcase(_TC, _Config) ->
-    meck:unload(amoc_dist).
+    meck:unload(amoc_dist),
+    meck:unload(amoc_config).
 
 setup_meck(start_scenario) ->
     meck:expect(amoc_dist, get_state, fun() -> idle end),
-    meck:expect(amoc_dist, do, fun(sample_test, 0, []) -> {ok, mocked} end);
+    meck:expect(amoc_dist, do, fun(sample_test, 0, []) -> {ok, mocked} end),
+    meck:expect(amoc_dist, update_settings, fun(_, _) -> {ok, mocked} end),
+    meck:expect(amoc_dist, add, fun(_) -> {ok, mocked} end),
+    meck:expect(amoc_config, get, fun(interarrival) -> 50 end);
 setup_meck(start_scenario_with_users_and_settings) ->
     meck:expect(amoc_dist, get_state, fun() -> idle end),
     meck:expect(amoc_dist, do,
-                fun(sample_test, 10, Settings) ->
+                fun(sample_test, 0, Settings) ->
                     ?assertEqual(lists:sort(Settings), lists:sort(settings())),
                     {ok, mocked}
-                end);
+                end),
+    meck:expect(amoc_dist, update_settings, fun(_, _) -> {ok, mocked} end),
+    meck:expect(amoc_dist, add, fun(10) -> {ok, mocked} end),
+    meck:expect(amoc_config, get, fun(interarrival) -> 50 end);
 setup_meck(fail_to_start_when_amoc_dist_fails) ->
     meck:expect(amoc_dist, get_state, fun() -> idle end),
     meck:expect(amoc_dist, do,
-                fun(sample_test, 10, Settings) ->
+                fun(sample_test, 0, Settings) ->
                     ?assertEqual(lists:sort(Settings), lists:sort(settings())),
                     {error, mocked}
                 end);

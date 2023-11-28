@@ -37,10 +37,12 @@ start(#{<<"scenario">> := ScenarioName} = Body) ->
             SettingsMap = maps:get(<<"settings">>, Body, #{}),
             case read_settings(SettingsMap) of
                 {ok, Settings} ->
-                    amoc_dist:do(Scenario, 0, Settings),
-                    Interarrival = amoc_config:get(interarrival),
-                    update_interarrival(Interarrival),
-                    amoc_dist:add(Users);
+                    maybe
+                        {ok, _} ?= amoc_dist:do(Scenario, 0, Settings),
+                        Interarrival = amoc_config:get(interarrival),
+                        {ok, _} ?= update_interarrival(Interarrival),
+                        {ok, _} ?= amoc_dist:add(Users)
+                    end;
                 {error, _} = Err -> Err
             end;
         false ->

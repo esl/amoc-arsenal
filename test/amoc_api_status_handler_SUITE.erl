@@ -82,12 +82,14 @@ returns_up_when_amoc_up_and_disabled(Config) ->
     %% given
     EnvMap = given_amoc_envs_are_set(),
     ControllerMap = given_amoc_controller_is_mocked(disabled),
+    SettingsMap = given_amoc_config_scenario_is_mocked(),
     %% when
     StatusPath = proplists:get_value(status_path, Config),
     {CodeHttp, Body} = amoc_api_helper:get(StatusPath),
     %% then
+    ControllerStatus = ControllerMap#{<<"settings">> => SettingsMap},
     ExpectedBody = #{<<"amoc_status">> => <<"up">>,
-                     <<"controller">> => ControllerMap,
+                     <<"controller">> => ControllerStatus,
                      <<"env">> => EnvMap},
     ?assertEqual(200, CodeHttp),
     ?assertEqual(ExpectedBody, Body).
