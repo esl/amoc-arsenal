@@ -7,7 +7,7 @@ function enable_strict_mode() {
     # the below settings are based on:
     #    http://redsymbol.net/articles/unofficial-bash-strict-mode/
     set -euo pipefail
-    IFS=$'\n\t'
+    # IFS=$'\n\t'
 }
 
 function contains() {
