@@ -7,7 +7,7 @@ function enable_strict_mode() {
     # the below settings are based on:
     #    http://redsymbol.net/articles/unofficial-bash-strict-mode/
     set -euo pipefail
-    # IFS=$'\n\t'
+    IFS=$'\n\t'
 }
 
 function contains() {
@@ -80,10 +80,11 @@ function get_status() {
 }
 
 function node_list() {
-    local nodes=( "$@" ) nodes_json="" node=""
-    if [ "${#nodes[@]}" -gt "0" ]; then
-        nodes_json+='"nodes": ["'"${nodes[0]}"'"'
-        for node in "${nodes[@]:1}"; do
+    local nodes_json="" node=""
+    if [ "$#" -gt "0" ]; then
+        nodes_json+='"nodes": ["'"$1"'"'
+        shift 1
+        for node in "$@"; do
             nodes_json+=', "'"$node"'"'
         done
         nodes_json+='], '
