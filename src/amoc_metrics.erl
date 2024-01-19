@@ -79,7 +79,7 @@ maybe_add_reporter() ->
     case lists:keyfind(Reporter, 1, exometer_report:list_reporters()) of
         {Reporter, _} -> ok;
         _->
-            case amoc_config_env:get(graphite_host) of
+            case amoc_config_env:get(graphite_host, undefined) of
                 undefined -> ok;
                 Host ->
                     Prefix = amoc_config_env:get(graphite_prefix, net_adm:localhost()),
@@ -114,5 +114,6 @@ maybe_subscribe(ExName, Datapoints) ->
     end.
 
 maybe_init_predefined_metrics() ->
-    Preconfigured = amoc_config_utils:find_all_vars(predefined_metrics),
+    App = application:get_application(?MODULE),
+    Preconfigured = application:get_env(App, predefined_metrics, []),
     [init(Type, Name) || {Type, Name} <- lists:flatten(Preconfigured)].
