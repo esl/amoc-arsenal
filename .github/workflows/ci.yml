@@ -13,7 +13,7 @@ jobs:
     name: OTP ${{matrix.otp}}
     strategy:
       matrix:
-        otp: ['26.0', '25.3', '24.3']
+        otp: ['26.2', '25.3', '24.3']
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: actions/checkout@v4
@@ -28,7 +28,7 @@ jobs:
     name: docker container test with OTP ${{matrix.otp}}
     strategy:
       matrix:
-        otp: ['25.3', '24.3']
+        otp: ['26.2', '25.3', '24.3']
     runs-on: 'ubuntu-22.04'
     env:
       OTP_RELEASE: ${{ matrix.otp }}
@@ -37,7 +37,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
-          rebar3-version: '3.21.0'
+          rebar3-version: '3.22.0'
       - run: ./ci/build_docker_image.sh
       - run: ./ci/start_demo_cluster.sh
       - run: ./ci/test_amoc_cluster.sh

@@ -14,7 +14,8 @@ start_amoc() ->
 -spec stop_amoc() -> any().
 stop_amoc() ->
     application:stop(amoc_arsenal),
-    application:stop(amoc).
+    application:stop(amoc),
+    application:stop(telemetry).
 
 -spec remove_module(module()) -> any().
 remove_module(M) ->
