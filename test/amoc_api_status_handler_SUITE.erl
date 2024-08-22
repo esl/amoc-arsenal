@@ -232,7 +232,9 @@ given_amoc_controller_is_mocked(error) ->
     meck:expect(amoc_controller, get_status, fun() -> {error, mocked} end),
     #{<<"status">> => <<"error">>, <<"error">> => <<"mocked">>};
 given_amoc_controller_is_mocked(running) ->
-    Status = {running, test_scenario, 10, 10},
+    Status = {running, #{scenario => test_scenario,
+                         currently_running_users => 10,
+                         highest_user_id => 10}},
     meck:expect(amoc_controller, get_status, fun() -> Status end),
     #{<<"status">> => <<"running">>, <<"scenario">> => <<"test_scenario">>,
       <<"number_of_users">> => 10};

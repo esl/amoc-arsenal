@@ -141,7 +141,7 @@ get_scenario_info_returns_200_when_scenario_exists(Config) ->
                                  <<"update_fn">> =>
                                  <<"fun amoc_controller:maybe_update_interarrival_timer/2">>,
                                  <<"verification_fn">> =>
-                                 <<"fun amoc_controller:positive_integer/1">>},
+                                 <<"fun amoc_controller:non_neg_integer/1">>},
                            <<"some_parameter">> =>
                                #{<<"default_value">> => <<"undefined">>,
                                  <<"description">> => <<"\"some parameter\"">>,
