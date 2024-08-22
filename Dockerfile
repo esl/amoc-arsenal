@@ -1,6 +1,7 @@
 ARG otp_vsn=25.3
 FROM erlang:${otp_vsn}
-MAINTAINER Erlang Solutions <mongoose-im@erlang-solutions.com>
+LABEL org.label-schema.name='AMOC Arsenal' \
+      org.label-schema.vendor='Erlang Solutions'
 
 WORKDIR /amoc_arsenal
 

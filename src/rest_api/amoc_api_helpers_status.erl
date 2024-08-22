@@ -41,7 +41,7 @@ get_controller_status() ->
                  {finished, Scenario} ->
                      #{status => <<"finished">>,
                        scenario => atom_to_binary(Scenario, utf8)};
-                 {running, Scenario, NoOfUsers, _} ->
+                 {running, #{scenario := Scenario, currently_running_users := NoOfUsers}} ->
                      #{status => <<"running">>,
                        scenario => atom_to_binary(Scenario, utf8),
                        number_of_users => NoOfUsers}

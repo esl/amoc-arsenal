@@ -1,6 +1,5 @@
 -module(amoc_api_scenarios_handler_SUITE).
 
--include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
 -include("scenario_template.hrl").
 
@@ -12,6 +11,9 @@
 -define(SAMPLE_SCENARIO, sample_test).
 -define(SAMPLE_SCENARIO_DECLARATION,
         "-module(" ++ atom_to_list(?SAMPLE_SCENARIO) ++ ").").
+
+-define(PARSE_ERROR,
+        <<"\n                      [{{2,1},erl_parse,[\"syntax error before: \",[]]}]}]\n">>).
 
 -export([all/0, groups/0, init_per_testcase/2, end_per_testcase/2]).
 
@@ -80,14 +82,6 @@ put_scenarios_returns_400_and_error_when_scenario_is_not_valid(_Config) ->
     ?assertEqual(400, CodeHttp),
     ?assertEqual(#{<<"error">> => <<"invalid module">>}, Body).
 
--if(?OTP_RELEASE >= 24).
--define(PARSE_ERROR,
-        <<"\n                      [{{2,1},erl_parse,[\"syntax error before: \",[]]}]}]\n">>).
--else.
--define(PARSE_ERROR,
-        <<"\n                      [{2,erl_parse,[\"syntax error before: \",[]]}]}]\n">>).
--endif.
-
 put_scenarios_returns_200_and_compile_error_when_scenario_source_not_valid(_Config) ->
     %% given
     ScenarioContent = ?SAMPLE_SCENARIO_DECLARATION ++ "\ninvalid_source",
@@ -141,7 +135,7 @@ get_scenario_info_returns_200_when_scenario_exists(Config) ->
                                  <<"update_fn">> =>
                                  <<"fun amoc_controller:maybe_update_interarrival_timer/2">>,
                                  <<"verification_fn">> =>
-                                 <<"fun amoc_controller:positive_integer/1">>},
+                                 <<"fun amoc_controller:non_neg_integer/1">>},
                            <<"some_parameter">> =>
                                #{<<"default_value">> => <<"undefined">>,
                                  <<"description">> => <<"\"some parameter\"">>,
