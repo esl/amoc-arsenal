@@ -10,34 +10,36 @@ on:
 
 jobs:
   test:
-    name: OTP ${{matrix.otp}}
+    name: OTP ${{matrix.otp_vsn}}
     strategy:
       matrix:
-        otp: ['26.2', '25.3', '24.3']
-    runs-on: 'ubuntu-22.04'
+        otp_vsn: ['27', '26', '25']
+        rebar_vsn: ['3.23.0']
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{ matrix.otp }}
-          rebar3-version: '3.22.0'
+          otp-version: ${{ matrix.otp_vsn }}
+          rebar3-version: ${{ matrix.rebar_vsn }}
       - name: Run tests project
         run: rebar3 test
 
   integration_test:
-    name: docker container test with OTP ${{matrix.otp}}
+    name: docker container test with OTP ${{matrix.otp_vsn}}
     strategy:
       matrix:
-        otp: ['26.2', '25.3', '24.3']
-    runs-on: 'ubuntu-22.04'
+        otp_vsn: ['27', '26', '25']
+        rebar_vsn: ['3.23.0']
+    runs-on: 'ubuntu-24.04'
     env:
-      OTP_RELEASE: ${{ matrix.otp }}
+      OTP_RELEASE: ${{ matrix.otp_vsn }}
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{ matrix.otp }}
-          rebar3-version: '3.22.0'
+          otp-version: ${{ matrix.otp_vsn }}
+          rebar3-version: ${{ matrix.rebar_vsn }}
       - run: ./ci/build_docker_image.sh
       - run: ./ci/start_demo_cluster.sh
       - run: ./ci/test_amoc_cluster.sh
