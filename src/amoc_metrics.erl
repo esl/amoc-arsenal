@@ -1,6 +1,6 @@
 -module(amoc_metrics).
 
--export([start/0, init/2]).
+-export([start/0, init/2, user_size/0]).
 -export([update_time/2, update_counter/2, update_counter/1, update_gauge/2]).
 
 -include_lib("kernel/include/logger.hrl").
@@ -26,6 +26,9 @@ init(Type, Name) ->
     ExType = exometer_metric_type(Type),
     create_metric_and_maybe_subscribe(ExName, ExType).
 
+-spec user_size() -> [{size, non_neg_integer()}].
+user_size() ->
+    [{size, amoc_users_sup:count_no_of_users()}].
 
 -spec update_time(name(), integer()) -> ok.
 update_time(Name, Value) ->
