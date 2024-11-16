@@ -14,7 +14,7 @@ get_status() ->
                      {amoc, _Desc, _Vsn} -> <<"up">>;
                      false -> <<"down">>
                  end,
-    Env = get_envs(),
+    Env = maps:from_list(get_envs()),
     Status = #{amoc_status => AmocStatus, env => Env},
     maybe_add_controller_status(Status).
 

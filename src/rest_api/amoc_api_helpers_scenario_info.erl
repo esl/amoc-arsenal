@@ -1,28 +1,26 @@
 %%==============================================================================
-%% Copyright 2020 Erlang Solutions Ltd.
+%% Copyright 2024 Erlang Solutions Ltd.
 %% Licensed under the Apache License, Version 2.0 (see LICENSE file)
 %%==============================================================================
 -module(amoc_api_helpers_scenario_info).
+
+-include_lib("kernel/include/eep48.hrl").
+
 %% API
 -export([is_loaded/1,
          scenario_settings/1,
          scenario_params/1,
-         get_edoc/1]).
+         get_documentation/1]).
 
--spec get_edoc(module()) -> binary().
-get_edoc(Scenario) ->
-    case docsh_lib:get_docs(Scenario) of
+-spec get_documentation(module()) -> binary().
+get_documentation(Scenario) ->
+    case code:get_doc(Scenario) of
         {error, _} ->
             ScenarioName = atom_to_binary(Scenario, utf8),
             <<"cannot extract documentation for ", ScenarioName/binary>>;
-        {ok, Docs} ->
-            case docsh_format:lookup(Docs, Scenario, [moduledoc]) of
-                {not_found, _} ->
-                    <<"no documentation found">>;
-                {ok, [DocItem]} ->
-                    Doc = maps:get(<<"en">>, DocItem),
-                    iolist_to_binary(docsh_edoc:format_edoc(Doc, #{}))
-            end
+        {ok, #docs_v1{module_doc = ModuleDoc}} ->
+            Doc = maps:get(<<"en">>, ModuleDoc),
+            iolist_to_binary(Doc)
     end.
 
 -spec scenario_settings(module()) -> #{atom() => binary()}.

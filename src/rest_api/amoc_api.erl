@@ -8,12 +8,19 @@
 
 -spec start() -> {ok, pid()} | {error, any()}.
 start() ->
-    LogicHandler = amoc_api_logic_handler,
+    amoc_api_logic_handler:set_validator_state(),
     Port = amoc_config_env:get(api_port, 4000),
-    ServerParams = #{ip => {0, 0, 0, 0}, port => Port, net_opts => [],
-                     logic_handler => LogicHandler},
-    amoc_rest_server:start(http_server, ServerParams).
+    TransportOpts = #{socket_opts => [{ip, {0, 0, 0, 0}}, {port, Port}]},
+    amoc_rest_server:start(
+        openapi_http_server,
+        #{
+            transport => tcp,
+            transport_opts => TransportOpts,
+            protocol_opts => #{},
+            logic_handler => amoc_api_logic_handler
+        }
+    ).
 
 -spec stop() -> ok | {error, not_found}.
 stop() ->
-    cowboy:stop_listener(http_server).
+    cowboy:stop_listener(openapi_http_server).

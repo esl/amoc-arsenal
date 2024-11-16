@@ -12,8 +12,7 @@
 
 -spec start(body()) -> ret_value().
 start(#{<<"scenario">> := ScenarioName} = Body) ->
-    case
-        amoc_api_helpers_scenario_info:is_loaded(ScenarioName) of
+    case amoc_api_helpers_scenario_info:is_loaded(ScenarioName) of
         {true, Scenario} ->
             Users = maps:get(<<"users">>, Body, 0),
             SettingsMap = maps:get(<<"settings">>, Body, #{}),

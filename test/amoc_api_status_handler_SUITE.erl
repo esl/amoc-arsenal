@@ -170,7 +170,7 @@ returns_down_when_api_up_and_amoc_down(Config) ->
 remote_node_status_returns_404_for_unavailable_node(_Config)->
     {CodeHttp, Body} = amoc_api_helper:get("/status/unavailable@node"),
     ?assertEqual(404, CodeHttp),
-    ?assertEqual(#{}, Body).
+    ?assertEqual(empty_body, Body).
 
 remote_node_status_returns_400_for_invalid_node(_Config)->
     %% node name doesn't follow ^[^@]+@[^@]+$ pattern,
@@ -186,7 +186,7 @@ returns_nodes_list_when_amoc_up(_Config) ->
     {CodeHttp, JSON} = amoc_api_helper:get(?NODES_PATH),
     %% then
     ?assertEqual(200, CodeHttp),
-    ?assertEqual( #{<<"nodes">> =>NodesMap}, JSON).
+    ?assertEqual(#{<<"nodes">> => NodesMap}, JSON).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% HELPERS
@@ -205,12 +205,14 @@ given_amoc_envs_are_set() ->
     maps:from_list(AmocEnvs).
 
 given_prepared_nodes() ->
-    ConnectionStatus = #{connected => [test1],
-                         failed_to_connect => [test2],
-                         connection_lost => [test3, test2]},
+    ConnectionStatus = #{connected => [test1@nohost],
+                         failed_to_connect => [test2@nohost],
+                         connection_lost => [test3@nohost, test2@nohost]},
     meck:expect(amoc_cluster, get_status, fun() -> ConnectionStatus end),
-    #{atom_to_binary(node(), utf8) => <<"up">>, <<"test1">> => <<"up">>,
-      <<"test2">> => <<"down">>, <<"test3">> => <<"down">>}.
+    #{atom_to_binary(node(), utf8) => <<"up">>,
+      <<"test1@nohost">> => <<"up">>,
+      <<"test2@nohost">> => <<"down">>,
+      <<"test3@nohost">> => <<"down">>}.
 
 settings() ->
     [{some_map, #{a => b}},
