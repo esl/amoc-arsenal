@@ -1,20 +1,18 @@
 ## Metrics
 
-`amoc_metrics` allow to configure a Graphite reporter using the following environment variables:
+`amoc_metrics` allow to configure a Prometheus exporter using the following environment variables:
 
-* ``graphite_host`` - a graphite host address (string or `undefined`):
-    * default value - `undefined` (amoc_metrics do not try to initialise a metrics reporter)
-    * example: `AMOC_GRAPHITE_HOST='"graphite"'`
+* `prometheus_port` - prometheus port:
+    * default value - `9090`
+    * example: `AMOC_PROMETHEUS_PORT='9090'`
 
-* ``graphite_port`` - graphite port:
-    * default value - `2003`
-    * example: `AMOC_GRAPHITE_PORT='2003'`
+* `prometheus_ip` - prometheus IP:
+    * default value - `{127, 0, 0, 1}`
+    * example: `AMOC_PROMETHEUS_IP='{0, 0, 0, 0}'`
 
-* ``graphite_prefix`` - graphite prefix:
-    * default value - `net_adm:localhost()`
-    * example: `AMOC_GRAPHITE_PREFIX='"amoc"'`
-
-In order to initialise some preconfigured metrics, other applications can declare the `predefined_metrics` environment variable (in their own `*.app.src` file):  
+In order to initialise some preconfigured metrics,
+other applications can declare the `predefined_metrics`
+environment variable (in their own `*.app.src` file):
 ```erl
-{predefined_metrics, [{gauge, some_metric}, {times, another_metric}]}
+{predefined_metrics, [{gauge, some_metric}, {histogram, another_metric}]}
 ```
