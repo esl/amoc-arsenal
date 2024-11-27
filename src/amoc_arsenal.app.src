@@ -1,16 +1,15 @@
 {application, amoc_arsenal, [
-    {description, "An OTP application"},
-    {vsn, "0.1.0"},
+    {description, "A batteries-included load-testing tool."},
+    {vsn, git},
     {registered, []},
     {mod, {amoc_arsenal_app, []}},
     {applications, [
         kernel,
         stdlib,
-        amoc,
         exometer_core,
         exometer_report_graphite,
         amoc_rest,
-        docsh
+        amoc
     ]},
     {env, [
         {exometer_predefined, [

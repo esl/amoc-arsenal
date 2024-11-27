@@ -1,10 +1,11 @@
 -module(amoc_api_helper).
 
 -export([get/1, put/2, patch/1, patch/2,
+         request/5, get_url/0,
          start_amoc/0, stop_amoc/0,
          remove_module/1]).
 
--type json() :: jsx:json_term().
+-type json() :: json:decode_value().
 
 
 -spec start_amoc() -> any().
@@ -25,7 +26,8 @@ remove_module(M) ->
     supervisor:restart_child(amoc_sup, amoc_code_server).
 
 -spec get(string()) -> {integer(), json()}.
-get(Path) -> get(get_url(), Path).
+get(Path) ->
+    get(get_url(), Path).
 
 -spec get(string(), string()) -> {integer(), json()}.
 get(BaseUrl, Path) ->
@@ -33,7 +35,8 @@ get(BaseUrl, Path) ->
 
 -spec put(string(), binary()) ->
     {integer(), json()}.
-put(Path, Body) -> put(get_url(), Path, Body).
+put(Path, Body) ->
+    put(get_url(), Path, Body).
 
 -spec put(string(), string(), binary()) ->
     {integer(), json()}.
@@ -42,11 +45,13 @@ put(BaseUrl, Path, Body) ->
 
 -spec patch(string()) ->
     {integer(), json()}.
-patch(Path) -> patch(get_url(), Path, <<"">>).
+patch(Path) ->
+    patch(get_url(), Path, <<>>).
 
--spec patch(string(), json()) ->
+-spec patch(string(), undefined | json()) ->
     {integer(), json()}.
-patch(Path, JSON) -> patch(get_url(), Path, jsx:encode(JSON)).
+patch(Path, JSON) ->
+    patch(get_url(), Path, json:encode(JSON)).
 
 -spec patch(string(), string(), binary()) ->
     {integer(), json()}.
@@ -55,7 +60,8 @@ patch(BaseUrl, Path, Body) ->
 
 -spec request(string(), binary(), binary()) ->
     {integer(), json()}.
-request(BaseUrl, Path, Method) -> request(BaseUrl, Path, Method, <<"">>).
+request(BaseUrl, Path, Method) ->
+    request(BaseUrl, Path, Method, <<>>).
 
 -spec request(string(), binary(), binary(), binary()) ->
     {integer(), json()}.
@@ -66,12 +72,12 @@ request(BaseUrl, Path, Method, RequestBody, ContentType) ->
     {ok, Client} = fusco:start(BaseUrl, []),
     {ok, Result} = fusco:request(
                     Client, Path, Method,
-                    [{<<"content-type">>, ContentType}],
+                    [{<<"content-type">>, ContentType} || ContentType =/= undefined],
                     RequestBody, 5000),
     {{CodeHttpBin, _}, _Headers, Body, _, _} = Result,
     BodyErl = case Body of
-                  <<"">> -> empty_body;
-                  _ -> jsx:decode(Body, [return_maps])
+                  <<>> -> empty_body;
+                  _ -> json:decode(Body)
               end,
     fusco:disconnect(Client),
     {erlang:binary_to_integer(CodeHttpBin), BodyErl}.

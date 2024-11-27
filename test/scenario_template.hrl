@@ -1,10 +1,8 @@
 -define(DUMMY_SCENARIO_MODULE(Name), <<"
-%%==============================================================================
-%% @doc
-%%   some edoc
-%% @end
-%%==============================================================================
 -module(", (atom_to_binary(Name, utf8))/binary, ").
+-moduledoc \"\"\"
+some edoc
+\"\"\".
 -behaviour(amoc_scenario).
 
 -required_variable(#{name => some_parameter, description => \"some parameter\"}).

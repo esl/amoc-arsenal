@@ -33,7 +33,7 @@ all() ->
     [{group, all}].
 
 groups() ->
-    [{all, [sequence], tests()}].
+    [{all, [], tests()}].
 
 tests() ->
     [
@@ -124,7 +124,7 @@ get_scenario_info_returns_200_when_scenario_exists(Config) ->
     %% when
     {CodeHttp, Body} = amoc_api_helper:get(?SCENARIOS_URL_I(?SAMPLE_SCENARIO)),
     ?assertEqual(200, CodeHttp),
-    ExpectedInfo = #{<<"doc">> => <<"\nsome edoc\n\n">>,
+    ExpectedInfo = #{<<"doc">> => <<"some edoc">>,
                      <<"parameters">> =>
                          #{<<"interarrival">> =>
                                #{<<"default_value">> => <<"50">>,
@@ -139,7 +139,7 @@ get_scenario_info_returns_200_when_scenario_exists(Config) ->
                            <<"some_parameter">> =>
                                #{<<"default_value">> => <<"undefined">>,
                                  <<"description">> => <<"\"some parameter\"">>,
-                                 <<"module">> => <<"sample_test">>,
+                                 <<"module">> => atom_to_binary(?SAMPLE_SCENARIO, utf8),
                                  <<"update_fn">> => <<"read_only">>,
                                  <<"verification_fn">> =>
                                  <<"fun amoc_config_attributes:none/1">>}}},
