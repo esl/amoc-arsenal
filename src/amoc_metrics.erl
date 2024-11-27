@@ -2,7 +2,7 @@
 
 -behaviour(prometheus_collector).
 
--export([start/0, init/2]).
+-export([start/0, start_predefined_metrics/1, init/2]).
 -export([update_counter/1, update_counter/2, update_gauge/2, update_time/2]).
 -export([deregister_cleanup/1, collect_mf/2]).
 
@@ -20,9 +20,12 @@
 
 -spec start() -> boolean().
 start() ->
-    HasMetrics = maybe_add_exporter(),
-    maybe_init_predefined_metrics(),
-    HasMetrics.
+    maybe_add_exporter().
+
+-spec start_predefined_metrics(atom()) -> any().
+start_predefined_metrics(App) ->
+    Preconfigured = application:get_env(App, predefined_metrics, []),
+    [init(Type, Name) || {Type, Name} <- lists:flatten(Preconfigured)].
 
 -spec init(type(), name()) -> ok.
 init(counters, Name) ->
@@ -83,8 +86,3 @@ maybe_add_exporter() ->
             ?LOG_INFO(#{what => no_prometheus_backend_enabled, port => Port, ip => Ip}),
             false
     end.
-
-maybe_init_predefined_metrics() ->
-    {ok, App} = application:get_application(?MODULE),
-    Preconfigured = application:get_env(App, predefined_metrics, []),
-    [init(Type, Name) || {Type, Name} <- lists:flatten(Preconfigured)].
