@@ -6,27 +6,10 @@
     {applications, [
         kernel,
         stdlib,
-        exometer_core,
-        exometer_report_graphite,
+        prometheus,
+        prometheus_cowboy,
         amoc_rest,
         amoc
-    ]},
-    {env, [
-        {exometer_predefined, [
-            {
-                [erlang, system_info],
-                {function, erlang, system_info, ['$dp'], value, [port_count, process_count]},
-                []
-            },
-            {
-                [erlang, memory],
-                {function, erlang, memory, ['$dp'], value, [
-                    total, processes, processes_used, system, binary, ets
-                ]},
-                []
-            },
-            {[amoc, users], {function, amoc_metrics, user_size, [], proplist, [size]}, []}
-        ]}
     ]},
     {modules, []},
     {licenses, ["Apache-2.0"]},
