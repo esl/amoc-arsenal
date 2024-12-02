@@ -72,17 +72,29 @@ deregister_cleanup(_Registry) -> ok.
 
 -spec maybe_add_exporter() -> boolean().
 maybe_add_exporter() ->
-    case {amoc_config_env:get(prometheus_port, 9090),
-          amoc_config_env:get(prometheus_ip, {0, 0, 0, 0})} of
-        {Port, IpTuple}
-          when is_integer(Port), is_tuple(IpTuple), 4 =:= tuple_size(IpTuple) ->
+    case {get_ip_address(), amoc_config_env:get(prometheus_port, 9090)} of
+        {IpTuple, Port}
+          when is_tuple(IpTuple), is_integer(Port) ->
             Routes = [{'_', [{"/metrics/[:registry]", prometheus_cowboy2_handler, []}]}],
             Dispatch = cowboy_router:compile(Routes),
             ProtocolOpts = #{env => #{dispatch => Dispatch}},
             TransportOpts = #{socket_opts => [{port, Port}, {ip, IpTuple}]},
             cowboy:start_clear(prometheus_exporter, TransportOpts, ProtocolOpts),
             true;
-        {Port, Ip} ->
-            ?LOG_INFO(#{what => no_prometheus_backend_enabled, port => Port, ip => Ip}),
+        {Ip, Port} ->
+            ?LOG_INFO(#{what => no_prometheus_backend_enabled, ip => Ip, port => Port}),
             false
+    end.
+
+get_ip_address() ->
+    case amoc_config_env:get(prometheus_ip, {0, 0, 0, 0}) of
+        IpTuple when is_tuple(IpTuple)
+                     andalso 4 =:= tuple_size(IpTuple)
+                     orelse 8 =:= tuple_size(IpTuple) ->
+            IpTuple;
+        IpAddr when is_list(IpAddr) ->
+            {ok, IpTuple} = inet:parse_address(IpAddr),
+            IpTuple;
+        _ ->
+            undefined
     end.

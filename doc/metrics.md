@@ -7,8 +7,11 @@
     * example: `AMOC_PROMETHEUS_PORT='9090'`
 
 * `prometheus_ip` - prometheus IP:
-    * default value - `{127, 0, 0, 1}`
-    * example: `AMOC_PROMETHEUS_IP='{0, 0, 0, 0}'`
+    * default value - `"127.0.0.1"`
+    * example: `AMOC_PROMETHEUS_IP='"127.0.0.1"'`
+
+Note that they are parsed as erlang terms and so the double-quotes inside the single-quotes are
+necessary.
 
 In order to initialise some preconfigured metrics,
 other applications can declare the `predefined_metrics`
