@@ -5,10 +5,14 @@ LABEL org.label-schema.name='AMOC Arsenal' \
 
 WORKDIR /amoc_arsenal
 
-COPY ./ ./
-RUN git clean -ffxd
+COPY rebar.lock .
+RUN rebar3 compile --deps_only
+COPY rebar.config .
+COPY src src
+COPY ci ci
+COPY priv priv
 RUN rebar3 release
 
-ENV PATH "/amoc_arsenal/_build/default/rel/amoc_arsenal/bin:${PATH}"
+ENV PATH="/amoc_arsenal/_build/default/rel/amoc_arsenal/bin:${PATH}"
 
 CMD ["amoc_arsenal", "console", "-noshell", "-noinput", "+Bd"]
