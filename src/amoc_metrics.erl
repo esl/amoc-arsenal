@@ -32,12 +32,10 @@ init(counters, Name) ->
     prometheus_counter:new([{name, Name}]);
 init(gauge, Name) ->
     prometheus_gauge:new([{name, Name}]);
-init(times, Name) ->
-    prometheus_summary:new([{name, Name}]);
 init(summary, Name) ->
     prometheus_summary:new([{name, Name}]);
-init(histogram, Name) ->
-    prometheus_histogram:new([{name, Name}]).
+init(Type, Name) when histogram =:= Type; times =:= Type ->
+    prometheus_histogram:new([{name, Name}, {buckets, histogram_buckets()}]).
 
 -spec update_counter(name()) -> ok.
 update_counter(Name) ->
@@ -98,3 +96,12 @@ get_ip_address() ->
         _ ->
             undefined
     end.
+
+-spec histogram_buckets() -> [integer()].
+histogram_buckets() ->
+    histogram_buckets([], 1 bsl 30). % ~1.07 * 10^9
+
+histogram_buckets(AccBuckets, Val) when Val > 0 ->
+    histogram_buckets([Val | AccBuckets], Val bsr 1);
+histogram_buckets(AccBuckets, _Val) ->
+    AccBuckets.
