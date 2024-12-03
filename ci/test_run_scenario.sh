@@ -28,3 +28,4 @@ worker_status=( '"amoc_status":"up"'
                 '"interarrival":"50"' )
 get_status amoc-worker-1 | contains "${worker_status[@]}"
 get_status amoc-worker-2 | contains "${worker_status[@]}"
+retry 60 curl 'http://localhost:9090/api/v1/query?query=\{__name__="dummy_scenario_metric"\}' | contains "success"

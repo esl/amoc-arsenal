@@ -29,13 +29,13 @@ start_predefined_metrics(App) ->
 
 -spec init(type(), name()) -> ok.
 init(counters, Name) ->
-    prometheus_counter:new([{name, Name}]);
+    prometheus_counter:new([{name, Name}, {help, ""}]);
 init(gauge, Name) ->
-    prometheus_gauge:new([{name, Name}]);
+    prometheus_gauge:new([{name, Name}, {help, ""}]);
 init(summary, Name) ->
-    prometheus_summary:new([{name, Name}]);
+    prometheus_summary:new([{name, Name}, {help, ""}]);
 init(Type, Name) when histogram =:= Type; times =:= Type ->
-    prometheus_histogram:new([{name, Name}, {buckets, histogram_buckets()}]).
+    prometheus_histogram:new([{name, Name}, {buckets, histogram_buckets()}, {help, ""}]).
 
 -spec update_counter(name()) -> ok.
 update_counter(Name) ->
@@ -51,7 +51,7 @@ update_gauge(Name, Value) ->
 
 -spec update_time(name(), integer()) -> ok.
 update_time(Name, Value) ->
-    prometheus_summary:observe(Name, Value).
+    prometheus_histogram:observe(Name, Value).
 
 -spec collect_mf(prometheus_registry:registry(), prometheus_collector:collect_mf_callback()) -> ok.
 collect_mf(_Registry, Callback) ->
