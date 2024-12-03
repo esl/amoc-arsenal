@@ -3,14 +3,14 @@
 source "$(dirname "$0")/helper.sh"
 enable_strict_mode
 
-docker_compose up --wait --wait-timeout 100 amoc-{master,worker-1,worker-2} graphite grafana
+docker_compose up --wait --wait-timeout 100 amoc-{master,worker-1,worker-2} prometheus grafana
 
 ## configure default grafana datasource
 json=( '{'
-       '"name": "graphite",'
+       '"name": "prometheus",'
        '"access": "proxy",'
-       '"type": "graphite",'
-       '"url": "http://graphite",'
+       '"type": "prometheus",'
+       '"url": "http://prometheus:9090",'
        '"isDefault": true'
        '}' )
 

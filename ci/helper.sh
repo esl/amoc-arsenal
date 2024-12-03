@@ -81,7 +81,7 @@ function get_status() {
 ## graphite REST API functions ##
 #################################
 function metrics_reported() {
-    curl -s "http://localhost:8080/metrics/find?query=*" | contains "$@"
+    curl -s "http://localhost:9090/api/v1/targets" | contains "$@"
 }
 
 function wait_for_metrics() {

@@ -1,9 +1,10 @@
 x-amoc-defaults: &amoc-defaults
   image: "amoc-arsenal"
+  pull_policy: never
   networks:
     - amoc-test-network
   environment:
-    AMOC_GRAPHITE_HOST: '"graphite"'
+    AMOC_PROMETHEUS_IP: '{0, 0, 0, 0}'
     AMOC_NODES: "['amoc_arsenal@amoc-master']"
   healthcheck:
     test: "amoc_arsenal status"
@@ -29,14 +30,16 @@ services:
     hostname: "amoc-worker-3"
     ports:
       - "4003:4000"
-  graphite:
-    image: "graphiteapp/graphite-statsd:1.1.10-4"
+  prometheus:
+    image: "prom/prometheus"
     ports:
-      - "8080:80"
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - amoc-test-network
   grafana:
-    image: "grafana/grafana:8.2.6"
+    image: "grafana/grafana"
     ports:
       - "3000:3000"
     networks:
