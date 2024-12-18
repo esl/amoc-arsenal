@@ -117,6 +117,6 @@ maybe_subscribe(ExName, Datapoints) ->
     end.
 
 maybe_init_predefined_metrics() ->
-    App = application:get_application(?MODULE),
+    {ok, App} = application:get_application(?MODULE),
     Preconfigured = application:get_env(App, predefined_metrics, []),
     [init(Type, Name) || {Type, Name} <- lists:flatten(Preconfigured)].
