@@ -43,8 +43,8 @@ test_verification_function(_)    -> {true, new_value}.
 
 -spec init() -> ok.
 init() ->
-    ok = amoc_metrics:init(counters, dummy_scenario_metric),
-    ok = amoc_metrics:init(times, dummy_scenario_metric),
+    true = amoc_metrics:init(counters, dummy_scenario_metric),
+    true = amoc_metrics:init(times, dummy_scenario_metric),
     %% amoc follows a couple of rules during the scenario initialisation:
     %%  - if any parameter verification fails, amoc will not start
     %%    the scenario and the init/0 function is not triggered.

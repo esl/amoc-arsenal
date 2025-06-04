@@ -23,15 +23,15 @@ start() ->
     maybe_init_predefined_metrics(),
     maybe_add_exporter().
 
--spec init(type(), name()) -> ok.
+-spec init(type(), name()) -> boolean().
 init(counters, Name) ->
-    prometheus_counter:new([{name, Name}, {help, ""}]);
+    prometheus_counter:declare([{name, Name}, {help, ""}]);
 init(gauge, Name) ->
-    prometheus_gauge:new([{name, Name}, {help, ""}]);
+    prometheus_gauge:declare([{name, Name}, {help, ""}]);
 init(summary, Name) ->
-    prometheus_summary:new([{name, Name}, {help, ""}]);
+    prometheus_summary:declare([{name, Name}, {help, ""}]);
 init(Type, Name) when histogram =:= Type; times =:= Type ->
-    prometheus_histogram:new([{name, Name}, {buckets, histogram_buckets()}, {help, ""}]).
+    prometheus_histogram:declare([{name, Name}, {buckets, histogram_buckets()}, {help, ""}]).
 
 -spec update_counter(name()) -> ok.
 update_counter(Name) ->
