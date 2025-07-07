@@ -20,6 +20,7 @@
 
 -spec start() -> boolean().
 start() ->
+    prometheus_registry:register_collector(?MODULE),
     maybe_init_predefined_metrics(),
     maybe_add_exporter().
 
