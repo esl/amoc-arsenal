@@ -12,7 +12,7 @@ some edoc
 
 -spec init() -> ok.
 init() ->
-    ok = amoc_metrics:init(counters, ", (atom_to_binary(Name, utf8))/binary, "),
+    amoc_metrics:init(counters, ", (atom_to_binary(Name, utf8))/binary, "),
     ok.
 
 -spec start(amoc_scenario:user_id()) -> any().
