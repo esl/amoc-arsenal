@@ -19,13 +19,17 @@ run_scenario amoc-master dummy_scenario 10 | contains 200
 echo "checking status of the nodes"
 get_status amoc-master | contains '"amoc_status":"up"' \
                                   '"status":"disabled"'
-sleep 1 ## 1 second is enought to start 5 users with 50ms interarrival timeout
-worker_status=( '"amoc_status":"up"'
-                '"status":"running"'
-                '"scenario":"dummy_scenario"'
-                '"number_of_users":5'
-                '"test":"<<\\"test_value\\">>"'
-                '"interarrival":"50"' )
-get_status amoc-worker-1 | contains "${worker_status[@]}"
-get_status amoc-worker-2 | contains "${worker_status[@]}"
+sleep 1 ## 1 seconds is enough to start 5 users
+status=( '"amoc_status":"up"'
+         '"status":"running"'
+         '"scenario":"dummy_scenario"'
+         '"number_of_users":5'
+       )
+settings=( '"test":"<<\\"test_value\\">>"'
+           ## adding the new node doesn't change the user_rate
+           '"user_rate":"4000"'
+           '"interarrival":"30"' )
+get_status amoc-master | contains "${settings[@]}" '"status":"disabled"' '"amoc_status":"up"'
+get_status amoc-worker-1 | contains "${status[@]}" "${settings[@]}"
+get_status amoc-worker-2 | contains "${status[@]}" "${settings[@]}"
 retry 60 curl 'http://localhost:9090/api/v1/query?query=\{__name__="dummy_scenario_metric"\}' | contains "success"

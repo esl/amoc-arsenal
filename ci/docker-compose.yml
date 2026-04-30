@@ -6,6 +6,7 @@ x-amoc-defaults: &amoc-defaults
   environment:
     AMOC_PROMETHEUS_IP: '{0, 0, 0, 0}'
     AMOC_NODES: "['amoc_arsenal@amoc-master']"
+    AMOC_INTERARRIVAL: 30
   healthcheck:
     test: "amoc_arsenal status"
 
