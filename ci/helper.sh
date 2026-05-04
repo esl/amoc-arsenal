@@ -74,7 +74,21 @@ function get_nodes() {
 function get_status() {
     local servise="$1"
     local port="$(amoc_container_port "$servise")"
-    curl -s -X GET "http://localhost:${port}/status" -H  "accept: application/json"
+    echo -e "\nstatus ${1}:" >/dev/tty
+    curl -s -X GET "http://localhost:${port}/status" -H  "accept: application/json" | tee /dev/tty
+    echo -e "\n" >/dev/tty
+}
+
+function node_list() {
+    local nodes=( "$@" ) nodes_json="" node=""
+    if [ "${#nodes[@]}" -gt "0" ]; then
+        nodes_json+='"nodes": ["'"${nodes[0]}"'"'
+        for node in "${nodes[@]:1}"; do
+            nodes_json+=', "'"$node"'"'
+        done
+        nodes_json+='], '
+    fi
+    echo -n "$nodes_json"
 }
 
 #################################

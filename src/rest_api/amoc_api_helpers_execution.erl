@@ -8,7 +8,7 @@
 %% attempts to simulate per-node interarrival.
 %% But, unlike the original behavior, adding a new node
 %% does not change the rate for new users.
--required_variable(#{name => interarrival, default_value => 50,
+-required_variable(#{name => interarrival, default_value => 50, scope => global,
                      verification => {?MODULE, positive_integer, 1},
                      description => "a delay between creating the processes for two "
                                     "consecutive users (ms, def: 50ms)",

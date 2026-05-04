@@ -7,18 +7,6 @@ enable_strict_mode
 ## amoc REST API functions ##
 #############################
 
-function node_list() {
-    local nodes=( "$@" ) nodes_json="" node=
-    if [ "${#nodes[@]}" -gt "0" ]; then
-        nodes_json+='"nodes": ["'"${nodes[0]}"'"'
-        for node in "${nodes[@]:1}"; do
-            nodes_json+=', "'"$node"'"'
-        done
-        nodes_json+='], '
-    fi
-    echo -n "$nodes_json"
-}
-
 function add_users() {
     local port="$(amoc_container_port "$1")" # $1 - where to send request
     local n="$2" # $2 - number of users to add
@@ -54,7 +42,7 @@ worker_status=( '"amoc_status":"up"'
                 '"status":"running"'
                 '"scenario":"dummy_scenario"'
                 '"test":"<<\\"test_value\\">>"'
-                '"interarrival":"50"' )
+                '"interarrival":"30"' )
 get_status amoc-worker-1 | contains "${worker_status[@]}" '"number_of_users":11'
 get_status amoc-worker-2 | contains "${worker_status[@]}" '"number_of_users":11'
 get_status amoc-worker-3 | contains "${worker_status[@]}" '"number_of_users":11'
