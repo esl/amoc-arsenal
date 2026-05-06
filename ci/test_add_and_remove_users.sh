@@ -11,8 +11,8 @@ function add_users() {
     local port="$(amoc_container_port "$1")" # $1 - where to send request
     local n="$2" # $2 - number of users to add
     shift 2
-    local nodes="$(node_list "$@")"
-    local json_body="{ ${nodes} \"users\": $n}"
+    local maybe_nodes="$(node_list "$@")"
+    local json_body="{ ${maybe_nodes} \"users\": ${n}}"
     curl -X PATCH --header 'Content-Type: application/json' --header 'Accept: application/json' \
          -s  -w " %{http_code}" -d "$json_body" "http://localhost:${port}/execution/add_users"
 }
@@ -21,8 +21,8 @@ function remove_users() {
     local port="$(amoc_container_port "$1")" # $1 - where to send request
     local n="$2" # $2 - number of users to add
     shift 2
-    local nodes="$(node_list "$@")"
-    local json_body="{ ${nodes} \"users\": $n}"
+    local maybe_nodes="$(node_list "$@")"
+    local json_body="{ ${maybe_nodes} \"users\": ${n}}"
     curl -X PATCH --header 'Content-Type: application/json' --header 'Accept: application/json' \
          -s  -w " %{http_code}" -d "$json_body" "http://localhost:${port}/execution/remove_users"
 }

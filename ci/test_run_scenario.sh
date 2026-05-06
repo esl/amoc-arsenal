@@ -8,7 +8,7 @@ enable_strict_mode
 #############################
 run_scenario() {
     local port="$(amoc_container_port "$1")"
-    local json_body='{ "scenario": "'"$2"'", "users": '"$3"' , "settings" : { "test" : "<<\"test_value\">>" } }'
+    local json_body='{ "scenario": "'"$2"'", "users": '"$3"', "settings" : { "test" : "<<\"test_value\">>" } }'
     curl -X PATCH --header 'Content-Type: application/json' --header 'Accept: application/json' \
          -s  -w "%{http_code}" -o /dev/null -d "$json_body" "http://localhost:${port}/execution/start"
 }

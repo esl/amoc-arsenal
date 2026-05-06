@@ -11,9 +11,8 @@ function update_settings() {
     local port="$(amoc_container_port "$1")" # $1 - where to send request
     local settings="$2" # $2 - settings
     shift 2
-    local nodes="$(node_list "$@")"
-    local json_body="{ ${nodes} \"settings\": ${settings} }"
-    echo "json_body = '$json_body'" >&2
+    local maybe_nodes="$(node_list "$@")"
+    local json_body="{ ${maybe_nodes} \"settings\": ${settings} }"
     curl -X PATCH --header 'Content-Type: application/json' --header 'Accept: application/json' \
          -s  -w " %{http_code}" -d "$json_body" "http://localhost:${port}/execution/update_settings"
 }
