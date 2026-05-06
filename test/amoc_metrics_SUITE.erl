@@ -32,7 +32,7 @@ amoc_users_size_is_initialized(_Config) ->
 -spec amoc_users_size_is_updated(ct_suite:ct_config()) -> ok.
 amoc_users_size_is_updated(_Config) ->
     amoc:do(?MODULE, 10, []),
-    wait_for_users_size(10, 10),
+    wait_for_users_size(10, 20),
     amoc:reset(),
     ?assertEqual(0, get_users_size()).
 

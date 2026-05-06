@@ -77,6 +77,16 @@ function get_status() {
     curl -s -X GET "http://localhost:${port}/status" -H  "accept: application/json"
 }
 
+function json_list() {
+    jq -n -c --args '$ARGS.positional' "$@"
+}
+
+function node_list() {
+    if [ "$#" -gt '0' ]; then
+        echo "\"nodes\": $(json_list "$@"), "
+    fi
+}
+
 #################################
 ## graphite REST API functions ##
 #################################

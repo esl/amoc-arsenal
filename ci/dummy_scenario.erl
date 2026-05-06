@@ -28,9 +28,11 @@
     #{name => var5, description => "description5", default_value => def5},
     %% when value is not set, it defaults to `undefined`
     #{name => var6, description => "description6"},
-    #{name => nodes, description => "this variable is set for docker "
-                                    "container via AMOC_NODES env"},
-    #{name => test, description => "this one to be set via REST API"}]).
+    %% 'none' is a predefined update function which means no action on value update
+    #{name => nodes, update => none,
+     description => "this variable is set for docker container via AMOC_NODES env"},
+    #{name => test, update => none,
+      description => "this one to be set via REST API"}]).
 
 %% parameter verification method
 -export([test_verification_function/1]).

@@ -17,7 +17,10 @@ worker_status=( '"amoc_status":"up"'
                 '"status":"running"'
                 '"scenario":"dummy_scenario"'
                 '"test":"<<\\"test_value\\">>"'
-                '"interarrival":"50"' )
+                ## adding the new node doesn't change the user_rate
+                ## interarrival is 30, so for 2 nodes user rate must be 4000
+                '"user_rate":"4000"'
+                '"interarrival":"30"' )
 get_status amoc-worker-1 | contains "${worker_status[@]}" '"number_of_users":5'
 get_status amoc-worker-2 | contains "${worker_status[@]}" '"number_of_users":5'
 sleep 1 ## wait one second to ensure that noumber of users is indeed 0

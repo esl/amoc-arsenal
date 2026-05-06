@@ -50,6 +50,7 @@ get_controller_status() ->
 
 maybe_add_settings(#{status := S} = Status) when S =:= <<"running">>;
                                                  S =:= <<"terminating">>;
+                                                 S =:= <<"disabled">>;
                                                  S =:= <<"finished">> ->
     Settings = get_current_settings(),
     Status#{settings => Settings};

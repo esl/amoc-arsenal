@@ -47,9 +47,6 @@ tests() ->
      get_scenario_defaults_returns_404_when_scenario_does_not_exist
     ].
 
-init_per_testcase(get_scenario_info_returns_404_when_scenario_does_not_exist, Config) ->
-    amoc_api_helper:start_amoc(),
-    Config;
 init_per_testcase(_, Config) ->
     amoc_api_helper:start_amoc(),
     Config.
@@ -92,7 +89,7 @@ put_scenarios_returns_200_and_compile_error_when_scenario_source_not_valid(_Conf
     ?assertNot(filelib:is_regular(ScenarioFileSource)),
     ?assertEqual(200, CodeHttp),
     Error = <<"compilation errors: [{\"", (list_to_binary(ScenarioFileSource))/binary, "\",",
-              (?PARSE_ERROR)/binary>>,
+              "\n                      [{{2,1},erl_parse,[\"syntax error before: \",[]]}]}]\n">>,
     ?assertEqual(#{<<"compile">> => Error}, Body).
 
 put_scenarios_returns_200_when_scenario_valid(Config) ->
@@ -128,21 +125,28 @@ get_scenario_info_returns_200_when_scenario_exists(Config) ->
                      <<"parameters">> =>
                          #{<<"interarrival">> =>
                                #{<<"default_value">> => <<"50">>,
-                                 <<"description">> => <<"\"a delay between creating the"
+                                 <<"description">> => <<"<<\"a delay between creating the"
                                                         " processes for two consecutive"
-                                                        " users (ms, def: 50ms)\"">>,
-                                 <<"module">> => <<"amoc_controller">>,
+                                                        " users (ms, def: 50ms)\">>">>,
+                                 <<"module">> => <<"amoc_api_helpers_execution">>,
                                  <<"update_fn">> =>
-                                 <<"fun amoc_controller:maybe_update_interarrival_timer/2">>,
+                                    <<"fun amoc_api_helpers_execution:update_interarrival/2">>,
                                  <<"verification_fn">> =>
-                                 <<"fun amoc_controller:non_neg_integer/1">>},
+                                    <<"fun amoc_api_helpers_execution:positive_integer/1">>},
                            <<"some_parameter">> =>
                                #{<<"default_value">> => <<"undefined">>,
-                                 <<"description">> => <<"\"some parameter\"">>,
+                                 <<"description">> => <<"<<\"some parameter\">>">>,
                                  <<"module">> => atom_to_binary(?SAMPLE_SCENARIO, utf8),
                                  <<"update_fn">> => <<"read_only">>,
                                  <<"verification_fn">> =>
-                                 <<"fun amoc_config_attributes:none/1">>}}},
+                                    <<"fun amoc_config_attributes:none/1">>},
+                           <<"user_rate">> =>
+                               #{<<"default_value">> => <<"1200">>,
+                                 <<"description">> => <<"<<\"Throttle rate for the "
+                                                        "Scenario:start/1,2 callback\">>">>,
+                                 <<"module">> => <<"amoc_controller">>,
+                                 <<"update_fn">> => <<"fun amoc_controller:update_user_rate/2">>,
+                                 <<"verification_fn">> =>  <<"fun amoc_controller:verify_user_rate/1">>}}},
     ?assertMatch(ExpectedInfo, Body),
     meck:unload(amoc_code_server).
 
@@ -160,6 +164,7 @@ get_scenario_defaults_returns_200_when_scenario_exists(Config) ->
     {CodeHttp, Body} = amoc_api_helper:get(?SCENARIOS_URL_D(?SAMPLE_SCENARIO)),
     ?assertEqual(200, CodeHttp),
     ExpectedInfo = #{<<"settings">> => #{<<"interarrival">> => <<"50">>,
+                                         <<"user_rate">> => <<"1200">>,
                                          <<"some_parameter">> => <<"undefined">>}},
     ?assertMatch(ExpectedInfo, Body),
     meck:unload(amoc_code_server).
@@ -167,14 +172,6 @@ get_scenario_defaults_returns_200_when_scenario_exists(Config) ->
 mock_amoc_code_server() ->
     ok = meck:new(amoc_code_server, [passthrough]),
     Fun = fun() ->
-            Modules = meck:passthrough([]),
-            Modules -- arsenal_app_modules()
+            Modules = meck:passthrough([])
           end,
     ok = meck:expect(amoc_code_server, list_configurable_modules, Fun).
-
--spec arsenal_app_modules() -> [atom()].
-arsenal_app_modules() ->
-    Path = code:lib_dir(amoc_arsenal, ebin),
-    {ok, FileNames} = file:list_dir(Path),
-    BeamFileNames = lists:filter(fun(Name) -> filename:extension(Name) =:= ".beam" end, FileNames),
-    [list_to_atom(filename:rootname(Name)) || Name <- BeamFileNames].
