@@ -5,7 +5,7 @@ enable_strict_mode
 cd "$git_root"
 
 version="$(git rev-parse --short HEAD)"
-otp_vsn="${OTP_RELEASE:-29}"
+otp_vsn="${OTP_RELEASE:-29.0}"
 echo "ERLANG/OTP '${otp_vsn}'"
 
 docker build \
