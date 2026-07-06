@@ -13,8 +13,8 @@ jobs:
     name: OTP ${{matrix.otp_vsn}}
     strategy:
       matrix:
-        otp_vsn: ['28', '27']
-        rebar_vsn: ['3.25.0']
+        otp_vsn: ['29', '28']
+        rebar_vsn: ['3.27.0']
     runs-on: 'ubuntu-24.04'
     steps:
       - uses: actions/checkout@v4
@@ -29,8 +29,8 @@ jobs:
     name: docker container test with OTP ${{matrix.otp_vsn}}
     strategy:
       matrix:
-        otp_vsn: ['28', '27']
-        rebar_vsn: ['3.25.0']
+        otp_vsn: ['29', '28']
+        rebar_vsn: ['3.27.0']
     runs-on: 'ubuntu-24.04'
     env:
       OTP_RELEASE: ${{ matrix.otp_vsn }}
